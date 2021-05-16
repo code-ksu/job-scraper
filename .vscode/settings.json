@@ -7,5 +7,8 @@
         "latex",
         "plaintext"
     ],
-    "python.pythonPath": "C:\\Users\\tesle\\.conda\\envs\\scraping\\python.exe"
+    "python.pythonPath": "C:\\Users\\tesle\\.conda\\envs\\scraping\\python.exe",
+    "cSpell.words": [
+        "scrapy"
+    ]
 }
