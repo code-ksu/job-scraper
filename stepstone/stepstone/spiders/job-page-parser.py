@@ -2,6 +2,7 @@ from scrapy.selector import Selector
 from scrapy.http import HtmlResponse
 from scrapy import Spider
 from scrapy import Request
+import dateparser
 
 
 class JobSpider(Spider):
@@ -14,11 +15,11 @@ class JobSpider(Spider):
     def parse(self, response):
         for job in response.css("article[data-at='job-item']"):
             job_link = job.css("a[data-at='job-item-title']::attr(href)").get()
-            time = job.css("time::text").get()
+            time = dateparser.parse(job.css("time::text").get())
             yield response.follow(job_link, callback=self.parse_job, cb_kwargs=dict(time=time))
         
-        #next_page = response.css('a[data-at="pagination-next]::attr(href)').get()
-        #yield response.follow(next_page, callback=self.parse)
+        next_page = response.css('a[data-at="pagination-next]::attr(href)').get()
+        yield response.follow(next_page, callback=self.parse)
 
     def parse_job(self, response, time):
         urlParts = response.url.split('--')
@@ -27,12 +28,12 @@ class JobSpider(Spider):
         for job in response.css("div.listing-content"):
             yield {
                 'id': urlParts[-1].split('-')[0],
+                'time': time,
                 'title': job.css('h1.at-header-company-jobTitle::text').get(),
                 'company': job.css('a.at-header-company-name::text').get(),
                 'location': job.css('li.at-listing__list-icons_location::text').get(),
                 'contract_type': job.css('li.at-listing__list-icons_contract-type::text').get(),
                 'work_type': job.css('li.at-listing__list-icons_work-type::text').get(),
-                'online_date': job.css('li.at-listing__list-icons_date span.js-ld-OnlineDate time::attr(datetime)').get(),
                 'introduction': job.css('div.at-section-text-introduction-content p').get(),
                 'job_description': job.css('div.at-section-text-description-content').get(),
                 'profile': job.css('div.at-section-text-profile-content').get(),
