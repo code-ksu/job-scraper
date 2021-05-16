@@ -18,7 +18,7 @@ class JobSpider(Spider):
             time = dateparser.parse(job.css("time::text").get())
             yield response.follow(job_link, callback=self.parse_job, cb_kwargs=dict(time=time))
         
-        next_page = response.css('a[data-at="pagination-next]::attr(href)').get()
+        next_page = response.css("a[data-at='pagination-next']::attr(href)").get()
         yield response.follow(next_page, callback=self.parse)
 
     def parse_job(self, response, time):
