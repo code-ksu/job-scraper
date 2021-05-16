@@ -3,14 +3,6 @@ from scrapy.http import HtmlResponse
 from scrapy import Spider
 from scrapy import Request
 
-#URL = "https://www.stepstone.de/stellenangebote--Sachbearbeiter-m-w-d-Debitoren-Duesseldorf-Services-by-Handelsblatt-Media-Group-GmbH--7059501-inline.html?suid=98ec0d4a-3eb3-4931-be66-69ad2edd91d3&rltr=3_3_25_dynrl_m_0_0_0_0_1"
-#
-# def parse_item(self, response):
-#     item = DemoItem()
-#     item["product_title"] = response.xpath("a/text()").extract()
-#     item["product_link"] = response.xpath("a/@href").extract()
-#     response.xpath("div[@class = 'desc']/text()").extract()
-#     return items
 
 class JobSpider(Spider):
     name = "stepstone"
