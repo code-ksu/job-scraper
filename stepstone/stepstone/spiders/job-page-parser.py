@@ -8,16 +8,25 @@ class JobSpider(Spider):
     name = "stepstone"
 
     start_urls = [
-        "https://www.stepstone.de/stellenangebote--Sachbearbeiter-m-w-d-Debitoren-Duesseldorf-Services-by-Handelsblatt-Media-Group-GmbH--7059501-inline.html",
-        "https://www.stepstone.de/stellenangebote--Data-Scientist-m-w-d-Berlin-Berylls--7158683-inline.html?suid=df1f70f3-e148-4577-8df7-000e19726e6e&rltr=3_3_25_dynrl_m_0_0_0_0_1"
+        "https://www.stepstone.de/5/ergebnisliste.html?searchTypeFrom=detailedSearch&searchOrigin=Detailed-Search_detailed-search&newsearch=1&keyword=&freetext_exact=false&freetext_all_words=false"
     ]
 
     def parse(self, response):
-        self.log(f'READ JOB OFFER')
+        for job in response.css("article[data-at='job-item']"):
+            job_link = job.css("a[data-at='job-item-title']::attr(href)").get()
+            time = job.css("time::text").get()
+            yield response.follow(job_link, callback=self.parse_job, cb_kwargs=dict(time=time))
+        
+        #next_page = response.css('a[data-at="pagination-next]::attr(href)').get()
+        #yield response.follow(next_page, callback=self.parse)
+
+    def parse_job(self, response, time):
+        urlParts = response.url.split('--')
+        self.log(f'parsing job offer: {urlParts[1]} at {time}')
 
         for job in response.css("div.listing-content"):
             yield {
-                'id': response.url.split('--')[-1].split('-')[0],
+                'id': urlParts[-1].split('-')[0],
                 'title': job.css('h1.at-header-company-jobTitle::text').get(),
                 'company': job.css('a.at-header-company-name::text').get(),
                 'location': job.css('li.at-listing__list-icons_location::text').get(),
